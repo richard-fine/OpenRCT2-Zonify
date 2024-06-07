@@ -5,7 +5,7 @@ import { main } from "./main"
 registerPlugin({
 	name: "Zonify",
 	version: "1.0",
-	authors: [ "Zoneify" ],
+	authors: [ "zdenardi" ],
 	type: "remote",
 	licence: "MIT",
 	/**

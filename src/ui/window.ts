@@ -2,6 +2,7 @@ import { MapSelection, toMapRange } from "../helpers/mapSelection";
 import { MapSelectionTool } from "../tools/mapSelectionTools";
 import { debug } from "../helpers/logger";
 import { isDevelopment } from "../helpers/environment";
+import { ZoneWindow } from "./zoneWindow";
 const windowId = "zonify-window";
 const btnAddZone = "zonify-add-btn";
 const listZones = "zonify-zones-list"
@@ -74,7 +75,10 @@ export class ZonifyWindow
                     columns:[columns],
                     items:createZoneListItems(),
                     isStriped:true,
-                    onClick:(item)=>console.log("You clicked!" + item),
+                    onClick:(item)=>{
+                        const zoneWindow = new ZoneWindow(item)
+                        zoneWindow.open()
+                    },
                     x:30,
                     y:100,
                     height:100,
@@ -101,7 +105,6 @@ export class ZonifyWindow
             ]  
             })
         }
-        // setTool(this,"add")
     }
     /**
      * Closes window 
