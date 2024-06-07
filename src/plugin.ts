@@ -1,11 +1,11 @@
 /// <reference path="../lib/openrct2.d.ts" />
 
-import { startup } from "./startup";
+import { main } from "./main"
 
 registerPlugin({
-	name: "Name of your plugin",
+	name: "Zonify",
 	version: "1.0",
-	authors: [ "Your name" ],
+	authors: [ "Zoneify" ],
 	type: "remote",
 	licence: "MIT",
 	/**
@@ -15,5 +15,5 @@ registerPlugin({
 	 * @see https://github.com/OpenRCT2/OpenRCT2/blob/v0.4.4/src/openrct2/scripting/ScriptEngine.h#L50
 	 */
 	targetApiVersion: 70,
-	main: startup,
+	main: main,
 });
