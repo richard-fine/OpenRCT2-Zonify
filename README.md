@@ -9,10 +9,10 @@ New "Zonify" plugin window
 - if Zone is created and player tries to build within that zone, error occurs
 
 Todo: 
-- Create popup window when zone is selected/clicked
-   - Can delete zone
-   - can assign zone to player(s)
-- have some sort of representation of the zone seen on the map
+- Can delete zones
+- Have multiple owners
+- Only admin can set/delete zones set/change/add owners
+
 
 
 --------------
