@@ -2,7 +2,6 @@ import { MapSelection, toMapRange } from "../helpers/mapSelection";
 import { MapSelectionTool } from "../tools/mapSelectionTools";
 import { debug } from "../helpers/logger";
 import { isDevelopment } from "../helpers/environment";
-import { window,button } from "openrct2-flexui";
 const windowId = "zonify-window";
 const btnAddZone = "zonify-add-btn";
 const listZones = "zonify-zones-list"
@@ -14,7 +13,6 @@ export class ZonifyWindow
 {
     _tool = new MapSelectionTool("zonify","path_down")
     _toolMode: ToolMode ="off"
-    _zonesArray: MapRange[] = context.getParkStorage().get<MapRange[]>('zones') || []
 
     constructor(){
         this._tool.onSelect = (selection):void=>onUseTool(selection,this._toolMode);
@@ -99,7 +97,7 @@ export class ZonifyWindow
                     window:window,
                     tooltip:"Add a zone"
                 },
-                   
+            ]  
             })
         }
         // setTool(this,"add")
@@ -146,10 +144,14 @@ function onUseTool(selection:MapSelection,toolMode:ToolMode):void{
                 {
                     console.log("Need to addzone!");
                     const storage = context.getParkStorage();
-                    const zonesArray = storage.get<MapRange[]>('zones');
+                    const zonesArray = storage.get<Zone[]>('zones');
                     if(zonesArray){
-                        zonesArray.push(range);
-                        storage.set<MapRange[]>('zones',zonesArray)                        
+                        const zoneObj = {
+                            owner: network.currentPlayer,
+                            range
+                        }
+                        zonesArray.push(zoneObj);
+                        storage.set<Zone[]>('zones',zonesArray)                        
                     }
                    
         
@@ -181,11 +183,15 @@ function deleteZones(){
 function createZoneListItems():ListViewItem[]{
     const items: string[] = []
     const storage = context.getParkStorage();
-    const zonesArray = storage.get<MapRange[]>('zones');
-    for (let i = 0; i < zonesArray.length; i++) {
-        items.push(`Zone ${i+1}`)      
+    const zonesArray = storage.get<Zone[]>('zones');
+    if(zonesArray){
+        for (let i = 0; i < zonesArray.length; i++) {
+            items.push(`Zone ${i+1}`)      
+        }
+        return items
     }
-    return items
+    return []
+
 }
 
 function reloadList():void{
