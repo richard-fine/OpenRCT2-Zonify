@@ -18,13 +18,14 @@ export class ZonifyWindow
         this._tool.onSelect = (selection):void=>onUseTool(selection,this._toolMode);
         this._tool.onCancel = ():void=>setTool(this,"off");
     }
+    viewportFlagGridlines = (1 << 7);
 
     /**
      * Opens the window for the zone tool.
      */
     open():void{
         console.log("open")
-      
+        highlightZones();
         const window = ui.getWindow(windowId);
         if(window){
             debug("Zone path is shown");
@@ -106,11 +107,15 @@ export class ZonifyWindow
      * Closes window 
      */
     close():void{
+
         deactivate(this._tool);
         ui.closeWindows(windowId)
+  
+
     }
 }
 function deactivate(tool:MapSelectionTool):void{
+    unhighlightZones()
     tool.deactivate();
 }
 
@@ -137,11 +142,13 @@ function setTool(window:ZonifyWindow,mode:ToolMode):void{
 
 
 function onUseTool(selection:MapSelection,toolMode:ToolMode):void{
+    unhighlightZones();
     const range = toMapRange(selection);
     if(range){
         switch(toolMode){
             case "add":
                 {
+                    
                     console.log("Need to addzone!");
                     const storage = context.getParkStorage();
                     const zonesArray = storage.get<Zone[]>('zones');
@@ -155,8 +162,8 @@ function onUseTool(selection:MapSelection,toolMode:ToolMode):void{
                     }
                    
         
-                    console.log(storage.get('zones'))
                     reloadList()
+                    highlightZones();
                     break;
                 }
             default:
@@ -177,6 +184,7 @@ function deleteZones(){
     const storage = context.getParkStorage();
     storage.set('zones',[])
     reloadList()
+    unhighlightZones()
    
 }
 
@@ -197,4 +205,28 @@ function createZoneListItems():ListViewItem[]{
 function reloadList():void{
     const zoneList = ui.getWindow(windowId).findWidget<ListViewWidget>(listZones)
     zoneList.items = createZoneListItems()
+}
+
+function highlightZones():void{
+    const storage = context.getParkStorage();
+    const zonesArray = storage.get<Zone[]>('zones');
+    if(zonesArray){
+        let highlightedTiles:CoordsXY[] = []
+        console.log(zonesArray)
+        zonesArray.forEach((zone)=>{
+         const range = zone.range
+         for(let x = range.leftTop.x; x <= range.rightBottom.x;x++){
+            for(let y = range.leftTop.y; y<= range.rightBottom.y;y++){
+                highlightedTiles.push({x,y})
+            }
+         }
+        })
+        ui.tileSelection.tiles =highlightedTiles
+    }
+}
+
+function unhighlightZones():void{
+    ui.tileSelection.range = null;
+    ui.tileSelection.tiles = [];
+
 }
