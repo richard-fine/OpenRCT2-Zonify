@@ -2,7 +2,7 @@ import { MapSelection, toMapRange } from "../helpers/mapSelection";
 import { MapSelectionTool } from "../tools/mapSelectionTools";
 import { debug } from "../helpers/logger";
 import { isDevelopment } from "../helpers/environment";
-import { window,button } from "openrct2-flexui";
+import { ZoneWindow } from "./zoneWindow";
 const windowId = "zonify-window";
 const btnAddZone = "zonify-add-btn";
 const listZones = "zonify-zones-list"
@@ -14,19 +14,19 @@ export class ZonifyWindow
 {
     _tool = new MapSelectionTool("zonify","path_down")
     _toolMode: ToolMode ="off"
-    _zonesArray: MapRange[] = context.getParkStorage().get<MapRange[]>('zones') || []
 
     constructor(){
         this._tool.onSelect = (selection):void=>onUseTool(selection,this._toolMode);
         this._tool.onCancel = ():void=>setTool(this,"off");
     }
+    viewportFlagGridlines = (1 << 7);
 
     /**
      * Opens the window for the zone tool.
      */
     open():void{
         console.log("open")
-      
+        highlightZones();
         const window = ui.getWindow(windowId);
         if(window){
             debug("Zone path is shown");
@@ -75,7 +75,10 @@ export class ZonifyWindow
                     columns:[columns],
                     items:createZoneListItems(),
                     isStriped:true,
-                    onClick:(item)=>console.log("You clicked!" + item),
+                    onClick:(item)=>{
+                        const zoneWindow = new ZoneWindow(item)
+                        zoneWindow.open()
+                    },
                     x:30,
                     y:100,
                     height:100,
@@ -99,20 +102,23 @@ export class ZonifyWindow
                     window:window,
                     tooltip:"Add a zone"
                 },
-                   
+            ]  
             })
         }
-        // setTool(this,"add")
     }
     /**
      * Closes window 
      */
     close():void{
+
         deactivate(this._tool);
         ui.closeWindows(windowId)
+  
+
     }
 }
 function deactivate(tool:MapSelectionTool):void{
+    unhighlightZones()
     tool.deactivate();
 }
 
@@ -139,22 +145,28 @@ function setTool(window:ZonifyWindow,mode:ToolMode):void{
 
 
 function onUseTool(selection:MapSelection,toolMode:ToolMode):void{
+    unhighlightZones();
     const range = toMapRange(selection);
     if(range){
         switch(toolMode){
             case "add":
                 {
+                    
                     console.log("Need to addzone!");
                     const storage = context.getParkStorage();
-                    const zonesArray = storage.get<MapRange[]>('zones');
+                    const zonesArray = storage.get<Zone[]>('zones');
                     if(zonesArray){
-                        zonesArray.push(range);
-                        storage.set<MapRange[]>('zones',zonesArray)                        
+                        const zoneObj = {
+                            owner: network.currentPlayer,
+                            range
+                        }
+                        zonesArray.push(zoneObj);
+                        storage.set<Zone[]>('zones',zonesArray)                        
                     }
                    
         
-                    console.log(storage.get('zones'))
                     reloadList()
+                    highlightZones();
                     break;
                 }
             default:
@@ -175,20 +187,49 @@ function deleteZones(){
     const storage = context.getParkStorage();
     storage.set('zones',[])
     reloadList()
+    unhighlightZones()
    
 }
 
 function createZoneListItems():ListViewItem[]{
     const items: string[] = []
     const storage = context.getParkStorage();
-    const zonesArray = storage.get<MapRange[]>('zones');
-    for (let i = 0; i < zonesArray.length; i++) {
-        items.push(`Zone ${i+1}`)      
+    const zonesArray = storage.get<Zone[]>('zones');
+    if(zonesArray){
+        for (let i = 0; i < zonesArray.length; i++) {
+            items.push(`Zone ${i+1}`)      
+        }
+        return items
     }
-    return items
+    return []
+
 }
 
 function reloadList():void{
     const zoneList = ui.getWindow(windowId).findWidget<ListViewWidget>(listZones)
     zoneList.items = createZoneListItems()
+}
+
+function highlightZones():void{
+    const storage = context.getParkStorage();
+    const zonesArray = storage.get<Zone[]>('zones');
+    if(zonesArray){
+        let highlightedTiles:CoordsXY[] = []
+        console.log(zonesArray)
+        zonesArray.forEach((zone)=>{
+         const range = zone.range
+         for(let x = range.leftTop.x; x <= range.rightBottom.x;x++){
+            for(let y = range.leftTop.y; y<= range.rightBottom.y;y++){
+                highlightedTiles.push({x,y})
+            }
+         }
+        })
+        ui.tileSelection.tiles =highlightedTiles
+    }
+}
+
+function unhighlightZones():void{
+    ui.tileSelection.range = null;
+    ui.tileSelection.tiles = [];
+
 }

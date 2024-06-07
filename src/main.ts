@@ -21,13 +21,13 @@ export function main(): void
 	const storage = context.getParkStorage();
 	const zones = storage.has('zones');
 	if(!zones){
-		storage.set<MapRange[]>("zones",[])
+		storage.set<Zone[]>("zones",[])
 	}else{
 		debug("Zones entry already exists")
 	}
 	debug("Plugin started.");
 
-	if (!isUiAvailable || network.mode != "none")
+	if (!isUiAvailable )
 	{
 		return;
 	}
@@ -36,16 +36,18 @@ export function main(): void
 	ui.registerMenuItem("Zonify", () => zoneWindow.open());
 	context.subscribe('action.location',(e)=>{
 		let buildResult = true;
-		const zones = context.getParkStorage().get<MapRange[]>('zones');
+		const zones = context.getParkStorage().get<Zone[]>('zones');
 		if(zones){
 			zones.forEach((zone)=>{
 			
 			
 				if(
-					(e.x >= zone.leftTop.x && e.x <= zone.rightBottom.x) &&
-					(e.y >= zone.leftTop.y && e.y <= zone.rightBottom.y)
+					(e.x >= zone.range.leftTop.x && e.x <= zone.range.rightBottom.x) &&
+					(e.y >= zone.range.leftTop.y && e.y <= zone.range.rightBottom.y)&&
+					network.currentPlayer.id != zone.owner.id
 				){
 					buildResult =false
+					console.log(network.currentPlayer === zone.owner)
 				}
 			})
 		}
