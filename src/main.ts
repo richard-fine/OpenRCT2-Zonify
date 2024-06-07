@@ -27,7 +27,7 @@ export function main(): void
 	}
 	debug("Plugin started.");
 
-	if (!isUiAvailable || network.mode != "none")
+	if (!isUiAvailable )
 	{
 		return;
 	}
@@ -47,6 +47,7 @@ export function main(): void
 					network.currentPlayer.id != zone.owner.id
 				){
 					buildResult =false
+					console.log(network.currentPlayer === zone.owner)
 				}
 			})
 		}

@@ -1,23 +1,22 @@
 import { isDevelopment } from "../helpers/environment";
+import { getPlayers, getZones, setZones } from "../helpers/common";
 import { debug } from "../helpers/logger";
 
 const labelZone = "label-zone"
-const labelOwnerId = "label-owner-id"
 const labelOwnerName = "label-owner-name"
 const dropdownPlayers = "dropdown-players"
 const storage = context.getParkStorage();
-const zonesArray = storage.get<Zone[]>('zones') || []
 const widgetMargins = 37
 export class ZoneWindow {
-    id: Number;
+    zoneIndex: number;
     windowId: string;
     _zone: Zone | undefined
     
 
-    constructor(id:number){
-        this.id = id
-        this.windowId = `zone-window-${id}`
-        this._zone = zonesArray[id] 
+    constructor(zoneIndex:number){
+        this.zoneIndex = zoneIndex
+        this.windowId = `zone-window-${zoneIndex}`
+        this._zone = getZones()[zoneIndex]
         
     }
 
@@ -34,7 +33,6 @@ export class ZoneWindow {
             if(isDevelopment){
                 windowTitle += ["[DEBUG]"];
             }
-            console.log(network)
             ui.openWindow({
                 classification:this.windowId,
                 title: windowTitle,
@@ -46,7 +44,7 @@ export class ZoneWindow {
                         type:"label",
                         x:30,
                         y:widgetMargins,
-                        width:100,
+                        width:200,
                         height:20,
                         name:labelZone,
                         text:"Zone information",
@@ -56,40 +54,31 @@ export class ZoneWindow {
                         type:"label",
                         x:30,
                         y:widgetMargins * 2,
-                        width:100,
-                        height:20,
-                        name:labelOwnerId,
-                        text:`Owner id: ${this._zone?.owner.id}`,
-                        textAlign:"left"
-                    },
-                    <LabelDesc>{
-                        type:"label",
-                        x:30,
-                        y:widgetMargins * 3,
-                        width:100,
+                        width:200,
                         height:20,
                         name:labelOwnerName,
-                        text:`Owner name: ${this._zone?.owner.name}`,
+                        text:`Owner: ${this._zone?.owner.name}`,
                         textAlign:"left"
                     },
                     <LabelDesc>{
                         type:"label",
                         x:30,
                         y:widgetMargins * 4.5,
-                        width:100,
+                        width:200,
                         height:20,
                         name:labelOwnerName,
                         text:`Change Owner`,
                         textAlign:"left"
                     },
                     <DropdownDesc>{
+                        name:dropdownPlayers,
                         x:30,
                         y:widgetMargins*5,
-                        width:100,
+                        width:200,
                         height:20,
                         type:"dropdown",
-                        items:["Player 1","Player 2"],
-                        onChange:(index)=>{console.log(index)}
+                        items:createListFromPlayers(getPlayers()),
+                        onChange:(index)=>{changeOwner(index,this.zoneIndex,this.windowId)}
                     }
                   
                 ]
@@ -98,3 +87,25 @@ export class ZoneWindow {
     }
 
 }
+function createListFromPlayers(players:Player[]):string[]{
+    const arrayOfNames :string[] = []
+    players.forEach((player)=>{
+        arrayOfNames.push(player.name)
+    })
+    return arrayOfNames
+}
+
+function changeOwner(index:number,zoneIndex:number,windowId:string):void{
+    debug("Changing owner!");
+    const newOwner = getPlayers()[index]
+    let zones = getZones()
+    const editedZone = zones[zoneIndex];
+    editedZone.owner = newOwner;
+    zones = zones.map(zone=>zone.range !== editedZone.range ? zone : editedZone);
+    setZones(zones)
+    const window = ui.getWindow(windowId)
+    const label = window.findWidget<LabelWidget>(labelOwnerName)
+    label.text = editedZone.owner.name
+
+}
+

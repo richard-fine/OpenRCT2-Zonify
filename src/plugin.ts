@@ -6,7 +6,7 @@ registerPlugin({
 	name: "Zonify",
 	version: "1.0",
 	authors: [ "zdenardi" ],
-	type: "remote",
+	type: "local",
 	licence: "MIT",
 	/**
 	 * This field determines which OpenRCT2 API version to use. It's best to always use the
