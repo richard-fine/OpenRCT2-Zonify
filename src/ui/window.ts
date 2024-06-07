@@ -5,7 +5,7 @@ import { isDevelopment } from "../helpers/environment";
 import { window,button } from "openrct2-flexui";
 const windowId = "zonify-window";
 const btnAddZone = "zonify-add-btn";
-const listViewZones = "zonify-list-zones";
+const listZones = "zonify-zones-list"
 const widgetLineHeight = 14;
 
 type ToolMode = "add" |"off";
@@ -36,12 +36,22 @@ export class ZonifyWindow
             if(isDevelopment){
                 windowTitle += "[DEBUG]";
             }
-
+            const columns: ListViewColumn ={
+                canSort:true,
+                sortOrder:"ascending",
+                header:"Zones",
+                width:180,
+                ratioWidth:4,
+                minWidth: 100,
+                maxWidth:200,
+                headerTooltip:"List of zones"
+            }
+     
             ui.openWindow({
                 classification:windowId,
                 title: windowTitle,
                 width:260,
-                height:120,
+                height:500,
                 onClose:()=> deactivate(this._tool),
                 widgets:[
                     <ButtonWidget>{
@@ -60,24 +70,36 @@ export class ZonifyWindow
                         window:window,
                         tooltip:"Add a zone"
                     },
-                    <ButtonWidget>{
-                        name:btnAddZone,
-                        type:"button",
-                        x:30,
-                        y:77,
-                        width:100,
-                        height:30,
-                        text:"Delete all zones",
-                        onClick: () => deleteZones(),
-                        border:false,
-                        isPressed:false,
-                        isDisabled:false,
-                        isVisible:true,
-                        window:window,
-                        tooltip:"Add a zone"
-                    },
-                
-                ]
+                   <ListViewDesc>{
+                    showColumnHeaders:true,
+                    columns:[columns],
+                    items:createZoneListItems(),
+                    isStriped:true,
+                    onClick:(item)=>console.log("You clicked!" + item),
+                    x:30,
+                    y:100,
+                    height:100,
+                    width:200,
+                    name:listZones,
+                    type:"listview",
+                   },
+                   <ButtonWidget>{
+                    name:btnAddZone,
+                    type:"button",
+                    x:30,
+                    y:200,
+                    width:100,
+                    height:30,
+                    text:"Delete all zones",
+                    onClick: () => deleteZones(),
+                    border:false,
+                    isPressed:false,
+                    isDisabled:false,
+                    isVisible:true,
+                    window:window,
+                    tooltip:"Add a zone"
+                },
+                   
             })
         }
         // setTool(this,"add")
@@ -132,7 +154,7 @@ function onUseTool(selection:MapSelection,toolMode:ToolMode):void{
                    
         
                     console.log(storage.get('zones'))
-                    
+                    reloadList()
                     break;
                 }
             default:
@@ -147,26 +169,26 @@ function toggle(window:ZonifyWindow,mode:ToolMode):void{
     setTool(window, (window._toolMode != mode) ? mode : "off");
 }
 
-function createColumnsFromRanges(ranges:MapRange[]):ListViewColumn[]{
-    const columns:ListViewColumn[] = [];
-    ranges.forEach((range,key)=>{
-        const columnObj = {
-            canSort:false,
-            sortOrder:"none" as SortOrder,
-            header:`Zone- ${key}`,
-            headerTooltip:"",
-            width:40,
-            ratioWidth:1,
-            minWidth:20,
-            maxWidth:100,
-        }
-        columns.push(columnObj)
-    })
-  return columns
-}
+
 function deleteZones(){
     console.log("Deleting all zones!")
     const storage = context.getParkStorage();
     storage.set('zones',[])
+    reloadList()
    
+}
+
+function createZoneListItems():ListViewItem[]{
+    const items: string[] = []
+    const storage = context.getParkStorage();
+    const zonesArray = storage.get<MapRange[]>('zones');
+    for (let i = 0; i < zonesArray.length; i++) {
+        items.push(`Zone ${i+1}`)      
+    }
+    return items
+}
+
+function reloadList():void{
+    const zoneList = ui.getWindow(windowId).findWidget<ListViewWidget>(listZones)
+    zoneList.items = createZoneListItems()
 }

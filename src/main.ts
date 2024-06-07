@@ -45,8 +45,6 @@ export function main(): void
 					(e.x >= zone.leftTop.x && e.x <= zone.rightBottom.x) &&
 					(e.y >= zone.leftTop.y && e.y <= zone.rightBottom.y)
 				){
-					console.log(e)
-					console.log("No build!");
 					buildResult =false
 				}
 			})

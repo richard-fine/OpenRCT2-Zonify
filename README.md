@@ -1,3 +1,17 @@
+# Zonify 
+Allows admin to create "Build zones" and assign them to players so only that player can build in that zone.
+
+Special thanks to Basssiiie for the template and help!!
+
+Todo: 
+- Create popup window when zone is selected
+   - Can delete zone
+   - can assign zone to player(s)
+- have some sort of representation of the zone seen on the map
+
+
+--------------
+
 # Simple OpenRCT2 plugin template with Typescript
 
 A simple and minimal template for OpenRCT2 plugins, using Typescript, without any unnecessary extra's.
