@@ -2,9 +2,14 @@
 Allows admin to create "Build zones" and assign them to players so only that player can build in that zone.
 
 Special thanks to Basssiiie for the template and help!!
+Features:
+New "Zonify" plugin window
+ - Can Add zones
+   - added zones are added to a listview
+- if Zone is created and player tries to build within that zone, error occurs
 
 Todo: 
-- Create popup window when zone is selected
+- Create popup window when zone is selected/clicked
    - Can delete zone
    - can assign zone to player(s)
 - have some sort of representation of the zone seen on the map
