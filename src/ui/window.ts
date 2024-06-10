@@ -215,11 +215,10 @@ function highlightZones():void{
     const zonesArray = storage.get<Zone[]>('zones');
     if(zonesArray){
         let highlightedTiles:CoordsXY[] = []
-        console.log(zonesArray)
         zonesArray.forEach((zone)=>{
          const range = zone.range
-         for(let x = range.leftTop.x; x <= range.rightBottom.x;x++){
-            for(let y = range.leftTop.y; y<= range.rightBottom.y;y++){
+         for(let x = range.leftTop.x; x <= range.rightBottom.x;x = x+32){
+            for(let y = range.leftTop.y; y<= range.rightBottom.y;y=y+32){
                 highlightedTiles.push({x,y})
             }
          }
