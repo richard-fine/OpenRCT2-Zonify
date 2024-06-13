@@ -157,7 +157,7 @@ function onUseTool(selection:MapSelection,toolMode:ToolMode):void{
                     const zonesArray = storage.get<Zone[]>('zones');
                     if(zonesArray){
                         const zoneObj = {
-                            owner: network.currentPlayer,
+                            ownerId: network.currentPlayer.id,
                             range
                         }
                         zonesArray.push(zoneObj);
