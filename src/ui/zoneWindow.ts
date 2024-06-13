@@ -1,6 +1,7 @@
 import { isDevelopment } from "../helpers/environment";
 import { getPlayers, getZones, setZones } from "../helpers/common";
 import { debug } from "../helpers/logger";
+import { ZonifyWindow } from "./window";
 
 const labelZone = "label-zone"
 const labelOwnerName = "label-owner-name"
@@ -138,6 +139,8 @@ function deleteZone(deletedZone:Zone,windowId:string){
         return zone !== deletedZone
     })
     setZones(newZones)
+    const mainZoneWindow = new ZonifyWindow();
+    mainZoneWindow.reload()
     ui.getWindow(windowId).close()
-
+    
 }
