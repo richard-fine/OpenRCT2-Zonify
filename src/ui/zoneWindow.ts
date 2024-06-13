@@ -5,6 +5,7 @@ import { debug } from "../helpers/logger";
 const labelZone = "label-zone"
 const labelOwnerName = "label-owner-name"
 const dropdownPlayers = "dropdown-players"
+const btnDeleteZone = "delete-zone"
 const widgetMargins = 37
 export class ZoneWindow {
     zoneIndex: number;
@@ -84,6 +85,23 @@ export class ZoneWindow {
                         selectedIndex:selectedIndex,
                         items:createListFromPlayers(getPlayers()),
                         onChange:(index)=>{changeOwner(index,this.zoneIndex,this.windowId)}
+                    },
+                    <ButtonWidget>{
+                        name:btnDeleteZone,
+                        width:100,
+                        height:30,
+                        onClick:()=>{deleteZone(this._zone,this.windowId)},
+                        x:30,
+                        type:'button',
+                        y:widgetMargins*6,
+                        border:false,
+                        window:window,
+                        tooltip:"Delete Zone",
+                        isDisabled: false,
+                        isVisible:true,
+                        toolTip:"Delete a zone",
+                        isPressed:false,
+                        text:'Delete Zone'
                     }
                   
                 ]
@@ -114,3 +132,12 @@ function changeOwner(index:number,zoneIndex:number,windowId:string):void{
 
 }
 
+function deleteZone(deletedZone:Zone,windowId:string){
+    const zones = getZones();
+    const newZones = zones.filter((zone)=>{
+        return zone !== deletedZone
+    })
+    setZones(newZones)
+    ui.getWindow(windowId).close()
+
+}
