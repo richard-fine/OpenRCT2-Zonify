@@ -1,7 +1,8 @@
 import { debug } from "./helpers/logger";
 import { isUiAvailable } from "./helpers/environment";
 import { ZonifyWindow } from "./ui/window";
-
+import { ACTION_ZONE, setZoneArgs } from "./helpers/zones";
+import { initActions } from "./helpers/initActions";
 // function onClickMenuItem()
 // {
 // 	// Write code here that should happen when the player clicks the menu item under the map icon.
@@ -15,46 +16,57 @@ const zoneWindow = new ZonifyWindow()
  */
 export function main(): void
 {
-	/**
-	 * Makes sure that zones is initilized in storage
-	 */
-	const storage = context.getParkStorage();
-	const zones = storage.has('zones');
-	if(!zones){
-		storage.set<Zone[]>("zones",[])
-	}else{
-		debug("Zones entry already exists")
-	}
-	debug("Plugin started.");
+	const networkMode = network.mode;
+	switch(networkMode){
+		case 'server':
+			console.log("Zonify is running!")
+			initActions()
+	
+			/**
+			 * Makes sure that zones is initilized in storage
+			 */
+			const storage = context.getParkStorage();
+			const zones = storage.has('zones');
+			if(!zones){
+				storage.set<Zone[]>("zones",[])
+			}else{
+				debug("Zones entry already exists")
+			}
+			debug("Plugin started.");
+		
+			if (!isUiAvailable )
+			{
+				return;
+			}
+			console.log("I'm a server!");
+			ui.registerMenuItem("Zonify", () => zoneWindow.open());
 
-	if (!isUiAvailable )
-	{
-		return;
-	}
+			context.subscribe('action.query',(event)=>{
+				console.log(event)
+				if (event.result.position){
+					const playerId = event.player
+					context.executeAction(ACTION_ZONE,setZoneArgs(playerId,event.result.position.x,event.result.position.y),(result)=>{
+						if(result.error){
+							console.log("Send message!")
+							network.sendMessage('{RED}ERROR: {WHITE} You are not a owner of that zone!', [event.player]);
 
-
-	ui.registerMenuItem("Zonify", () => zoneWindow.open());
-	context.subscribe('action.location',(e)=>{
-		let buildResult = true;
-		const zones = context.getParkStorage().get<Zone[]>('zones');
-		if(zones){
-			zones.forEach((zone)=>{
-			
-			
-				if(
-					(e.x >= zone.range.leftTop.x && e.x <= zone.range.rightBottom.x) &&
-					(e.y >= zone.range.leftTop.y && e.y <= zone.range.rightBottom.y)&&
-					network.currentPlayer.id != zone.owner.id
-				){
-					buildResult =false
-					console.log(network.currentPlayer === zone.owner)
+						}
+						event.result = result
+					})
 				}
 			})
-		}
-
-		e.result = buildResult
+			break;
+		case 'client':
+			console.log("I'm a client");
+			initActions()
 	
-		
-	})
+			break;
+		default:
+			console.log("Offline!");
+	}
+
+
+
+
 }
 

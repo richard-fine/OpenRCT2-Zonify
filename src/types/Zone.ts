@@ -1,4 +1,4 @@
 interface Zone {
-    owner:Player,
+    ownerId:number,
     range:MapRange
 }
