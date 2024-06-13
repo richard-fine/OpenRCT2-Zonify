@@ -16,6 +16,7 @@ export const ACTION_ZONE = 'zonify'
 */
 	
 export function zoneActionQuery(args:GameActionZoneArgs):GameActionResult{
+    // Whats the difference between the query/execute?
     let player:Player
     console.log("Zone executing")
 
