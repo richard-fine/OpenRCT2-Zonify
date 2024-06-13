@@ -1,7 +1,7 @@
 import { debug } from "./helpers/logger";
 import { isUiAvailable } from "./helpers/environment";
 import { ZonifyWindow } from "./ui/window";
-import { ACTION_ZONE, setZoneArgs } from "./helpers/zones";
+import { ACTION_ZONE, playerCanBuildHere, setZoneArgs } from "./helpers/zones";
 import { initActions } from "./helpers/initActions";
 // function onClickMenuItem()
 // {
@@ -42,24 +42,19 @@ export function main(): void
 			ui.registerMenuItem("Zonify", () => zoneWindow.open());
 
 			context.subscribe('action.query',(event)=>{
-				console.log(event)
-				if (event.result.position){
-					const playerId = event.player
-					context.executeAction(ACTION_ZONE,setZoneArgs(playerId,event.result.position.x,event.result.position.y),(result)=>{
-						if(result.error){
-							console.log("Send message!")
-							network.sendMessage('{RED}ERROR: {WHITE} You are not a owner of that zone!', [event.player]);
+				if(!playerCanBuildHere(event)){
+					event.result = {
+						error:1,
+						errorTitle:"You can't build here",
+						errorMessage:"The admin has set zones using zonify plugin"
+					}
+					network.sendMessage('{RED}ERROR: {WHITE} You are not a owner of that zone!', [event.player]);
 
-						}
-						event.result = result
-					})
 				}
 			})
 			break;
 		case 'client':
 			console.log("I'm a client");
-			initActions()
-	
 			break;
 		default:
 			console.log("Offline!");

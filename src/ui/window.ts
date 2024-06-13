@@ -113,9 +113,15 @@ export class ZonifyWindow
 
         deactivate(this._tool);
         ui.closeWindows(windowId)
-  
-
     }
+    /**
+     * Reloads window
+     */
+    reload():void{
+        const zoneList = ui.getWindow(windowId).findWidget<ListViewWidget>(listZones)
+        zoneList.items = createZoneListItems()
+    }
+
 }
 function deactivate(tool:MapSelectionTool):void{
     unhighlightZones()
