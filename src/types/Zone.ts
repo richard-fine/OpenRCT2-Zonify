@@ -1,4 +1,4 @@
 interface Zone {
-    ownerId:number,
-    range:MapRange
+    ownerId: number,
+    range: MapRange
 }

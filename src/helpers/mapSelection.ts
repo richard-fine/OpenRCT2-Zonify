@@ -1,22 +1,20 @@
-import {error} from "./logger";
+import { error } from "./logger";
 
 /**
  * Class to specify an area on the map
  */
 
 export interface MapSelection {
-    start: CoordsXY;
-    end?: CoordsXY;
+	start: CoordsXY;
+	end?: CoordsXY;
 }
 
 /**
  * Converts the selection to the OpenRCT2 compatible MapRangeObject
  */
 
-export function toMapRange(selection:MapSelection):MapRange | null
-{
-	if (!selection.start || !selection.end)
-	{
+export function toMapRange(selection: MapSelection): MapRange | null {
+	if (!selection.start || !selection.end) {
 		error("Selection is incomplete.");
 		return null;
 	}
