@@ -120,6 +120,9 @@ export class ZonifyWindow
     reload():void{
         const zoneList = ui.getWindow(windowId).findWidget<ListViewWidget>(listZones)
         zoneList.items = createZoneListItems()
+        unhighlightZones()
+        highlightZones()
+       
     }
 
 }
