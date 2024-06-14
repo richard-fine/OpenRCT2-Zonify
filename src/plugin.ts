@@ -4,8 +4,8 @@ import { main } from "./main"
 
 registerPlugin({
 	name: "Zonify",
-	version: "1.0",
-	authors: [ "zdenardi" ],
+	version: "0.1",
+	authors: ["zdenardi"],
 	type: "remote",
 	licence: "MIT",
 	/**

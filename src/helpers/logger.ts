@@ -5,10 +5,8 @@ import { isDevelopment } from "./environment";
  * Logs a message is debug mode is enabled, or does nothing otherwise.
  * @param message The error message to be logged.
  */
-export function debug(message: string): void
-{
-	if (isDevelopment)
-	{
+export function debug(message: string): void {
+	if (isDevelopment) {
 		console.log(message);
 	}
 }
@@ -19,8 +17,7 @@ export function debug(message: string): void
  * @param message The error message to be logged.
  * @param method The method specifying where the error occured.
  */
-export function error(message: string, method?:string): void
-{
+export function error(message: string, method?: string): void {
 	console.log((method)
 		? `Error (${method}): ${message}`
 		: `Error: ${message}`);
